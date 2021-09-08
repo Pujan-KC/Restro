@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{>admin_header}}
+</head>
+
+<body>
+    {{>admin_navbar}}
+
+    <div class="container-fluid">
+        <div class="row">
+            {{>admin_sidebar}}
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <a href="/admin/menu/add-item" class="btn btn-sm btn-primary"> Add A Item</a>
+                <a href="/admin/menu/categories" class="btn btn-sm btn-primary">Categories</a>
+                <a href="/admin/menu" class="btn btn-sm btn-primary">Menu</a> <br>
+                <h4 class="text-success text-lead text-center text-capitalize">{{message}}</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>On Menu?</th>
+                            <th>Image</th>
+                            <th>TIttle</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td>{{this.show}}</td>
+                            <td>
+
+                                <figure>
+
+                                    <img src="/images/product_images/{{this.slug}}/{{this.image}}" width="200"
+                                        alt="{{this.slug}}">
+
+                                </figure>
+                            </td>
+                            <td>{{this.name}}</td>
+                            <td>{{this.category}}</td>
+                            <td>{{this.price}}</td>
+                        </tr>
+                        {{/each}}
+
+
+                    </tbody>
+                </table>
+            </main>
+        </div>
+    </div>
+
+    {{>admin_footer}}
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{>admin_header}}
+</head>
+
+<body>
+    {{>admin_navbar}}
+
+    <div class="container-fluid">
+        <div class="row">
+            {{>admin_sidebar}}
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h3>Categories </h3>
+                </div>
+                <a href="/admin/menu/add-category" class="btn btn-sm btn-primary"> Add A Category</a>
+                <a href="/admin/menu/items" class="btn btn-sm btn-primary">Items</a>
+                <a href="/admin/menu" class="btn btn-sm btn-primary">Menu</a> <br>
+                <h4 class="text-success text-lead text-center text-capitalize">{{message}}</h4>
+                <table class="table table-striped text-center ">
+                    <thead>
+                        <tr>
+                            <th>View</th>
+                            <th>Image</th>
+                            <th>Tittle</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody> {{#each categories}}
+                        <tr>
+
+                            <td>
+
+                                {{#if this.show}}
+                                <a href="/admin/menu/edit-category/{{this.slug}}?action=hide">
+                                    <button class="btn btn-warning btn-sm">Hide</button>
+                                </a>
+                                {{else}}
+                                <a href="/admin/menu/edit-category/{{this.slug}}?action=show">
+                                    <button class="btn btn-success btn-sm">Show</button>
+                                </a>
+                                {{/if}}
+
+                            </td>
+                            <td>
+                                <figure>
+                                    <img src="/images/cat_images/{{this.image}}" alt="{{this.image}}" width="150">
+                                </figure>
+                            </td>
+                            <td>{{this.tittle}}</td>
+                            <td>
+                                <a href="/admin/menu/edit-category/{{this.slug}}?action=edit">
+                                    <button class="btn btn-default text-warning">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                </a>
+                                <a href=" /admin/menu/edit-category/{{this.slug}}?action=delete" class="text-danger">
+                                    <button class="btn btn-default text-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </a>
+                            </td>
+
+                        </tr> {{/each}}
+                    </tbody>
+                </table>
+
+            </main>
+        </div>
+    </div>
+
+    {{>admin_footer}}
+</body>
+
+</html>

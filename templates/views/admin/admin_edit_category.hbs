@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{>admin_header}}
+</head>
+
+<body>
+    {{>admin_navbar}}
+
+    <div class="container-fluid">
+        <div class="row">
+            {{>admin_sidebar}}
+
+            <main class="col-md-9 ms-sm-auto col-lg-8 me-lg-auto px-md-4">
+                <div
+                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h3>Edit Category </h3>
+                </div>
+                <a href="/admin/menu/categories" class="btn btn-sm btn-primary"> All Categories</a>
+                <a href="/admin/menu/items" class="btn btn-sm btn-primary">Items</a>
+                <a href="/admin/menu" class="btn btn-sm btn-primary">Menu</a><br>
+                <h4 class="text warning text-capitalize text-center text-warning">{{message}}</h4>
+                {{#with category}}
+                <form action="/admin/menu/edit-category/{{slug}}" method="POST" enctype="multipart/form-data">
+
+                    <h3 class="text-center text-warning">{{message}} </h3>
+                    <label for="tittle">Tittle</label>
+                    <input type="text" name="tittle" class="form-control" placeholder="Tittle for Category"
+                        value="{{tittle}}">
+                    <h4 class="text-center">Current Image</h4>
+                    <figure>
+                        <img src="/images/cat_images/{{image}}" alt="{{image}}" width="250">
+                    </figure>
+                    <label for="image">Change Image for category</label>
+                    <input type="file" name="image" class="form-control" id="image">
+                    <button type="submit" class="btn btn-sm btn-success mt-2 px-5">Submit</button>
+
+                </form> {{/with}}
+            </main>
+        </div>
+    </div>
+    {{>admin_footer}}
+</body>
+
+</html>
