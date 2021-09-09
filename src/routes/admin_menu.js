@@ -8,6 +8,7 @@ const {
   items,
   add_items,
   post_add_item,
+  edit_item,
 } = require("../../controller/menu_control");
 
 router.get("/", (req, res) => {
@@ -35,5 +36,7 @@ router.get("/items", items);
 router.get("/add-item", add_items);
 
 router.post("/add-item", post_add_item);
+
+router.get("/edit-item/:slug", edit_item);
 
 module.exports = router;

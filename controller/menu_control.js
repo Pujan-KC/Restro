@@ -1,6 +1,7 @@
 const CatModel = require("../models/cat_model");
 const ItemModel = require("../models/item_model");
 const fs = require("fs-extra");
+const item_model = require("../models/item_model");
 
 //category index
 const categories = async (req, res) => {
@@ -200,8 +201,13 @@ const post_add_item = async (req, res) => {
     if (name && price && category) {
       req.body.name = req.body.name.trim();
       const ab = new ItemModel(req.body);
+      console.log(req.body.name);
+
       ab.slug = ab.name.replace(/\s+/g, "-").toLowerCase();
+      console.log(ab.slug);
+
       const check = await ItemModel.findOne({ slug: ab.slug });
+
       //if item already exists
       if (check) {
         not_valid("Item already Exists");
@@ -214,8 +220,9 @@ const post_add_item = async (req, res) => {
         //if image is valid
         if (info.includes("image")) {
           ab.image = ab.slug + "." + info[1];
+          //move image to directory
           image.mv(
-            `public/images/product_images/${ab.slug}/ ${ab.image}`,
+            `public/images/product_images/${ab.slug}/${ab.image}`,
             (err) => {
               if (err) console.log(err);
             }
@@ -242,6 +249,61 @@ const post_add_item = async (req, res) => {
     console.log(error);
   }
 };
+//get edit item
+const edit_item = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { action } = req.query;
+    const item = await ItemModel.findOne({ slug });
+    var { name, image, show, price, category } = item;
+    const categories = await CatModel.find();
+    const db_category = await CatModel.find({ slug: item.category });
+
+    for (i = 0; i < image.length; i++) {
+      console.log("hello");
+      image[i] = (slug + "/").concat(image[i]);
+    }
+    db_category.linker = slug;
+    console.log(image);
+
+    var message = "";
+
+    switch (action) {
+      case "hide":
+        await ItemModel.updateOne({ slug }, { $set: { show: false } });
+        message = `${item.name} Shown`;
+        break;
+      case "show":
+        await ItemModel.updateOne({ slug }, { $set: { show: true } });
+        message = `${item.name} Hidden`;
+        break;
+      case "edit":
+        return res.render("admin/admin_edit_item", {
+          name: name,
+          image: image,
+          show: show,
+          price: price,
+          slug: slug,
+          categories: categories,
+          dbcategory: db_category,
+          linker: slug,
+        });
+        break;
+      case "delete":
+        await ItemModel.deleteOne({ slug });
+        message = "Item Deleted";
+        break;
+      default:
+        message = "Unauthorized action";
+        break;
+    }
+    req.flash("message", message);
+    res.redirect("back");
+    console.log(message);
+  } catch (error) {
+    console.log(error);
+  }
+};
 //exporting functions
 module.exports = {
   post_add_category,
@@ -251,4 +313,5 @@ module.exports = {
   items,
   add_items,
   post_add_item,
+  edit_item,
 };

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{>admin_header}}
+</head>
+
+<body>
+    {{>admin_navbar}}
+
+    <div class="container-fluid">
+        <div class="row">
+            {{>admin_sidebar}}
+            <main class="col-md-9 ms-sm-auto col-lg-8 me-lg-auto px-md-4">
+                <h3 class="text-dark text-center pt-1"> {{tittle}} </h3>
+                <a href="/admin/menu/categories" class="btn btn-sm btn-primary"> All Categories</a>
+                <a href="/admin/menu/items" class="btn btn-sm btn-primary">All Items</a>
+                <a href="/admin/menu" class="btn btn-sm btn-primary">Menu</a>
+                <form action="/admin/menu/add-item/" method="POST" enctype="multipart/form-data">
+                    <h3 class="text-center text-warning">{{message}} </h3>
+
+                    <label for="name">Name Of The Item</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Tittle for Item"
+                        value="{{name}}">
+                    <label for="price">Price Rs. ( <b class="text-primary">Price / unit</b> ) </label>
+                    <input type="text" id="price" name="price" value="{{price}}" class="form-control"
+                        placeholder="Price for the item / unit of measurement (optional)">
+                    <h5 class="text-center text-success text-center">Current Categories</h5>
+                    {{#each dbcategory}}
+                    {{this.tittle}}
+                    {{/each}}
+
+                    <h5 class="text-success text-center">Current Images</h5>
+                    <div class="row">
+
+                        {{#each image}}
+                        <div class="col col-sm-6 col-md-4">
+                            {{slug}}
+                            <figure>
+                                <img src="/images/product_images/{{this}}" width="150" alt="{{this}}"><br>
+                                "hello"
+                            </figure>
+                        </div>
+                        {{/each}}
+                    </div>
+                    <label for="category"> Select Category (<b class="text-primary">Press control to select multple
+                        </b>)</label>
+                    <select class="form-select" name="category" multiple>
+                        {{#each categories}}
+                        <option value="{{this.slug}}">{{this.tittle}}</option>
+                        {{/each}}
+                    </select>
+                    <label for="image" class="my-1">Add Another Image </label>
+                    <input type="file" name="image" class="form-control" id="image">
+                    <button type="submit" class="btn btn-sm btn-success mt-2 px-5">Submit</button>
+
+                </form>
+            </main>
+        </div>
+    </div>
+    {{>admin_footer}}
+</body>
+
+</html>

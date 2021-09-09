@@ -8,7 +8,7 @@ const itemSchema = new mongoose.Schema({
     unique: [true, "tittle already exists"],
   },
   category: [{ type: String }],
-  image: [{ type: String, trim: true, default: "noimage.png" }],
+  image: [{ type: String, default: "noimage.png" }],
   show: { type: Boolean, default: true },
   price: [{ type: String, trim: true }],
   slug: { type: String, unique: true },

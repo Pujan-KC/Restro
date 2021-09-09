@@ -17,42 +17,55 @@
                 <a href="/admin/menu" class="btn btn-sm btn-primary">Menu</a> <br>
                 <h4 class="text-success text-lead text-center text-capitalize">{{message}}</h4>
                 <table class="table table-striped">
-                    <thead>
+                    <thead class="text-center">
                         <tr>
-                            <th>On Menu?</th>
+                            <th>Available?</th>
                             <th>Image</th>
                             <th>TIttle</th>
                             <th>Category</th>
                             <th>Price</th>
+                            <th>Actions</th>
                         </tr>
 
                     </thead>
-                    <tbody>
+                    <tbody class="text-center">
                         {{#each items}}
                         <tr>
-                            <td>{{this.show}}</td>
                             <td>
-
-                                <figure>
-
+                                {{#if this.show}}
+                                <a class="btn btn-success btn-sm"
+                                    href="/admin/menu/edit-item/{{this.slug}}?action=hide">
+                                    YES</a>
+                                {{else}}
+                                <a class="btn btn-danger btn-sm" href="/admin/menu/edit-item/{{this.slug}}?action=show">
+                                    NO</a>
+                                {{/if}} <br>
+                                (click to change)
+                            </td>
+                            <td>
+                                <figure id="product-image">
                                     <img src="/images/product_images/{{this.slug}}/{{this.image}}" width="200"
                                         alt="{{this.slug}}">
-
                                 </figure>
                             </td>
                             <td>{{this.name}}</td>
                             <td>{{this.category}}</td>
                             <td>{{this.price}}</td>
+                            <td>
+                                <a href="/admin/menu/edit-item/{{this.slug}}?action=edit" class="btn btn-sm">
+                                    <i class="fa fa-pencil text-warning"></i>
+                                </a>
+                                <a href="/admin/menu/edit-item/{{this.slug}}?action=delete" class="btn btn-sm">
+                                    <i class="fa fa-trash text-danger"></i>
+                                </a>
+                            </td>
                         </tr>
                         {{/each}}
-
-
                     </tbody>
                 </table>
             </main>
         </div>
     </div>
-
     {{>admin_footer}}
 </body>
 
