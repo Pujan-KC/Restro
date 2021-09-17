@@ -1,15 +1,52 @@
 const CatModel = require("../models/cat_model");
 const ItemModel = require("../models/item_model");
 const fs = require("fs-extra");
-const item_model = require("../models/item_model");
+
+//menu index
+const menu = async (req, res) => {
+  try {
+    const categories = await CatModel.find().sort({ tittle: 1 });
+    var menu = [];
+    //for every category
+    for (var i = 0; i < categories.length; i++) {
+      //finding item realted to category[i]
+      const item = await ItemModel.find({ category: categories[i].slug });
+      var { tittle } = categories[i];
+      var monu = {}; //Object to hold category and its child items
+      monu.category = tittle;
+      monu.item = item;
+      menu.push(monu);
+    } //category loop
+    console.log(menu[3].item);
+    res.render("admin/admin_menu", {
+      ptittle: "MENU",
+      message: req.flash("message"),
+      menu: menu,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 //category index
 const categories = async (req, res) => {
   try {
     const categories = await CatModel.find();
     res.render("admin/admin_categories", {
+      ptittle: "Categories",
       message: req.flash("message"),
       categories: categories,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+//get add category
+const add_category = async (req, res) => {
+  try {
+    res.render("admin/admin_add_category", {
+      message: req.flash("message"),
+      ptittle: "Add Category",
     });
   } catch (error) {
     console.log(error);
@@ -20,6 +57,7 @@ const categories = async (req, res) => {
 const post_add_category = async (req, res) => {
   try {
     req.body.tittle = req.body.tittle.trim();
+    req.body.tittle = req.body.tittle.replace("/", "-");
     //if tittle is not empty
     if (req.body.tittle != "") {
       req.body.slug = req.body.tittle.replace(/\s+/g, "-").toLowerCase();
@@ -67,14 +105,13 @@ const post_add_category = async (req, res) => {
     console.log(error);
   }
 };
-//editing category
+//get edit category
 const edit_category = async (req, res) => {
   try {
     var message = "";
     const { slug } = req.params;
     const { action } = req.query;
     const category = await CatModel.findOne({ slug });
-
     switch (action) {
       case "hide":
         await CatModel.updateOne({ slug }, { $set: { show: false } });
@@ -97,6 +134,7 @@ const edit_category = async (req, res) => {
         return res.render("admin/admin_edit_category", {
           category: category,
           message: req.flash("message"),
+          ptittle: "Edit Category",
         });
         break;
 
@@ -131,7 +169,6 @@ const post_edit_category = async (req, res) => {
 
           //if previous image exists remove image
           if (oldCat.image != "noimage.png") {
-            console.log("here");
             fs.remove(`public/images/cat_images/${oldCat.image}`, (err) => {
               if (err) console.log(err);
             });
@@ -166,6 +203,7 @@ const items = async (req, res) => {
     res.render("admin/admin_items", {
       items: items,
       message: req.flash("message"),
+      ptittle: "Items",
     });
   } catch (error) {
     console.log(error);
@@ -184,7 +222,7 @@ const add_items = async (req, res) => {
     console.log(error);
   }
 };
-//Post add item
+//Post add new item
 const post_add_item = async (req, res) => {
   try {
     const categories = await CatModel.find();
@@ -199,18 +237,15 @@ const post_add_item = async (req, res) => {
     };
     //If all inputs are filled
     if (name && price && category) {
+      console.log("hit");
       req.body.name = req.body.name.trim();
+      req.body.price = req.body.price.replace("/", "-");
       const ab = new ItemModel(req.body);
-      console.log(req.body.name);
-
       ab.slug = ab.name.replace(/\s+/g, "-").toLowerCase();
-      console.log(ab.slug);
-
       const check = await ItemModel.findOne({ slug: ab.slug });
-
-      //if item already exists
+      //if item name already exists
       if (check) {
-        not_valid("Item already Exists");
+        not_valid("Item Name Already Exists");
       }
       fs.mkdirpSync(`public/images/product_images/${ab.slug}`);
       //if image is uploaded
@@ -230,12 +265,13 @@ const post_add_item = async (req, res) => {
         }
         //if image is invalid
         else {
-          not_valid("Please Provide An Image File");
+          not_valid("Please Provide A Valid Image File");
         }
-      } else {
+      }
+      //If Image iS Not Uploaded
+      else {
         ab.image = "noimage.png";
       }
-
       await ab.save();
       req.flash("message", "Item Added Successfully");
       return res.redirect("/admin/menu/items");
@@ -249,35 +285,29 @@ const post_add_item = async (req, res) => {
     console.log(error);
   }
 };
-//get edit item
+//Get edit item
 const edit_item = async (req, res) => {
   try {
     const { slug } = req.params;
     const { action } = req.query;
     const item = await ItemModel.findOne({ slug });
-    var { name, image, show, price, category } = item;
-    const categories = await CatModel.find();
-    const db_category = await CatModel.find({ slug: item.category });
-
-    for (i = 0; i < image.length; i++) {
-      console.log("hello");
-      image[i] = (slug + "/").concat(image[i]);
-    }
-    db_category.linker = slug;
-    console.log(image);
-
     var message = "";
-
     switch (action) {
+      //hide from menu
       case "hide":
         await ItemModel.updateOne({ slug }, { $set: { show: false } });
         message = `${item.name} Shown`;
         break;
+      //show from menu
       case "show":
         await ItemModel.updateOne({ slug }, { $set: { show: true } });
         message = `${item.name} Hidden`;
         break;
+      //edit item
       case "edit":
+        var { name, image, show, price } = item;
+        const assigned_category = item.category;
+        const categories = await CatModel.find();
         return res.render("admin/admin_edit_item", {
           name: name,
           image: image,
@@ -285,12 +315,15 @@ const edit_item = async (req, res) => {
           price: price,
           slug: slug,
           categories: categories,
-          dbcategory: db_category,
+          assignedcategory: assigned_category,
           linker: slug,
+          message: req.flash("message"),
+          ptittle: "Edit Item",
         });
         break;
       case "delete":
         await ItemModel.deleteOne({ slug });
+        fs.removeSync(`public/images/product_images/${slug}`);
         message = "Item Deleted";
         break;
       default:
@@ -299,19 +332,163 @@ const edit_item = async (req, res) => {
     }
     req.flash("message", message);
     res.redirect("back");
-    console.log(message);
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Post edit item
+const post_edit_item = async (req, res) => {
+  try {
+    var message = "";
+    var { slug } = req.params; //slug of item
+    var item = await ItemModel.findOne({ slug });
+    req.body.name = req.body.name.trim();
+    req.body.price = req.body.price.trim();
+    var { category, image, name, price } = item;
+    var value = image.length; //for numbering image
+    //If tittle is empty field
+    if (req.body.name == "") {
+      req.body.name = name;
+    }
+    //if new category is added
+    if (req.body.category) {
+      if (category.includes(req.body.category)) {
+        message += `${req.body.category} Category is Already Linked `;
+        req.body.category = category;
+      } else {
+        category.push(req.body.category);
+        req.body.category = category;
+        message += "New Category Linked ";
+      }
+    }
+    //if category is empty
+    else if (req.body.category == "") {
+      req.body.category = category;
+    }
+    //if image is added
+    if (req.files) {
+      var newimage = req.files.image;
+      var info = newimage.mimetype.split("/");
+      //if image is valid
+      if (info.includes("image")) {
+        var newimagename = slug + value + "." + info[1];
+        if (image.includes("noimage.png")) {
+          image.splice(0, 1);
+        }
+        newimage.mv(
+          `public/images/product_images/${slug}/${newimagename}`,
+          async (err) => {
+            if (err) console.log(err);
+            //if image is moved to directory
+            else {
+              image.push(newimagename);
+              await ItemModel.updateOne({ slug }, { $set: { image: image } });
+            }
+          }
+        );
+      }
+      //if image is invalid
+      else {
+        message += "Invalid Image File ";
+      }
+    }
+    //if price is added
+    if (req.body.price) {
+      if (price.includes(req.body.price)) {
+        req.body.price = price;
+        message += "Price Already Exists";
+      } else {
+        price.push(req.body.price);
+        req.body.price = price;
+        message += "New Price Added";
+      }
+    }
+    //default
+    else if (req.body.price == "") {
+      req.body.price = price;
+    } else {
+      message += "Unauthorized Action";
+    }
+    await ItemModel.updateOne({ slug }, { $set: req.body });
+    req.flash("message", message);
+    res.redirect("back");
+  } catch (error) {
+    console.log(error);
+  }
+};
+//Removing data and files linked to item
+const edit_item_linked = async (req, res) => {
+  try {
+    const { slug, name } = req.params;
+    const { action } = req.query;
+    const item = await ItemModel.findOne({ slug });
+    const { category, image, price } = item;
+
+    var message;
+    switch (action) {
+      //removing Category
+      case "removecategory":
+        if (category.length < 2) {
+          message = "Item Must Be Linked To A least One Category";
+        } else {
+          for (var i = 0; i < category.length; i++) {
+            if (category[i] === name) category.splice(i, 1);
+          }
+          await ItemModel.updateOne({ slug }, { $set: { category: category } });
+          message = "Category Unlinked From Item";
+        }
+        break;
+      //Removing Image
+      case "removeimage":
+        for (var i = 0; i < image.length; i++) {
+          if (image[i] === name) {
+            image.splice(i, 1);
+            fs.removeSync(`public/images/product_images/${slug}/${name}`);
+          }
+        }
+        if (image.length < 1) image.push("noimage.png");
+        await ItemModel.updateOne({ slug }, { $set: { image: image } });
+        message = "Image Removed";
+        break;
+      //Removing Pricing
+      case "removepricing":
+        //if only one pricing exists
+        if (price.length < 2) {
+          message = "Item Must Have At Least One Pricing ";
+        }
+        //if More than one pricing is available
+        else {
+          for (var i = 0; i < price.length; i++) {
+            if (price[i] === name) {
+              price.splice(i, 1);
+            }
+          }
+          await ItemModel.updateOne({ slug }, { $set: { price: price } });
+          message = "Pricing Removed = " + name;
+        }
+        break;
+      default:
+        message = "Un-Authorized Action";
+        break;
+    }
+    req.flash("message", message);
+    res.redirect("back");
   } catch (error) {
     console.log(error);
   }
 };
 //exporting functions
 module.exports = {
+  menu,
   post_add_category,
   categories,
+  add_category,
   edit_category,
   post_edit_category,
   items,
   add_items,
   post_add_item,
   edit_item,
+  post_edit_item,
+  edit_item_linked,
 };

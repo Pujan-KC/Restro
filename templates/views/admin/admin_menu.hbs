@@ -13,12 +13,81 @@
             {{>admin_sidebar}}
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div
-                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h3>MENU </h3>
+                <a href="/admin/menu/categories" class="btn btn-sm btn-success w-25 ">Manage Categories</a>
+                <a href="/admin/menu/items" class="btn btn-sm btn-success w-25">Manage Items</a>
+                <h3 class="text-center text-warning">{{message}}</h3>
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3
+                border-bottom">
+                    <h3>MENU </h3> <br>
                 </div>
-                <a href="/admin/menu/categories" class="btn btn-sm btn-primary">Categories</a>
-                <a href="/admin/menu/items" class="btn btn-sm btn-primary">Items</a>
+                {{!-- Displaying Menu --}}
+
+                <div class="row">
+
+                    <div class="col col-md-10 me-auto">
+                        {{#each menu}}
+                        <p>
+                            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#{{this.category}}" aria-expanded="false"
+                                aria-controls="{{this.category}}">
+                                {{this.category}}
+                            </button>
+                        </p>
+                        <div class="collapse" id="{{this.category}}">
+                            <table class="table menu-table">
+                                <tbody>
+                                    {{#each this.item}}
+                                    <tr class="text-uppercase">
+                                        <td>
+                                            {{#if this.show}}
+                                            <a class="btn btn-success btn-sm"
+                                                href="/admin/menu/edit-item/{{this.slug}}?action=hide">
+                                                Shown</a>
+                                            {{else}}
+                                            <a class="btn btn-danger btn-sm"
+                                                href="/admin/menu/edit-item/{{this.slug}}?action=show">
+                                                Hidden</a>
+                                            {{/if}}
+                                        </td>
+                                        <td>
+
+                                            <figure id="product-image">
+                                                <img src="/images/product_images/{{this.slug}}/{{this.image}}"
+                                                    onerror="this.onerror=null;this.src='/images/noimage.png';"
+                                                    width="80" alt="{{this.image}}">
+                                            </figure>
+
+                                        </td>
+                                        <td class="text-start">{{this.name}}</td>
+                                        <td class="text-end">{{this.price}}</td>
+                                        <td class="text-end">
+                                        <td class="text-end ">
+                                            <a href="/admin/menu/edit-item/{{this.slug}}?action=edit"
+                                                class="btn btn-sm">
+                                                <i class="fa fa-pencil text-warning"></i>
+                                            </a>
+                                            <a href="/admin/menu/edit-item/{{this.slug}}?action=delete"
+                                                class="btn btn-sm"
+                                                onclick="return confirm('Are you sure you want to delete this item')">
+                                                <i class="fa fa-trash text-danger"></i>
+                                            </a>
+                                        </td>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{/each}} {{!-- menu loop end --}}
+
+
+                    </div>
+
+                </div>
+
+
             </main>
         </div>
     </div>

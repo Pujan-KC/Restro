@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
-
 mongoose
   .connect(process.env.DATABASE, {
     useCreateIndex: true,
     useUnifiedTopology: true,
     useNewUrlParser: true,
-    useFindAndModify: false,
+    useFindAndModify: true,
   })
   .then(() => {
     console.log("Connection Successfull");

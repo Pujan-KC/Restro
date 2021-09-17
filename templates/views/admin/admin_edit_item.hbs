@@ -16,36 +16,19 @@
                 <a href="/admin/menu/categories" class="btn btn-sm btn-primary"> All Categories</a>
                 <a href="/admin/menu/items" class="btn btn-sm btn-primary">All Items</a>
                 <a href="/admin/menu" class="btn btn-sm btn-primary">Menu</a>
-                <form action="/admin/menu/add-item/" method="POST" enctype="multipart/form-data">
-                    <h3 class="text-center text-warning">{{message}} </h3>
+                <h4 class="text-success text-lead text-center text-capitalize">{{message}}</h4>
 
+                {{!-- Update Form for item --}}
+                <form action="/admin/menu/item-update/{{slug}}" method="POST" enctype="multipart/form-data">
                     <label for="name">Name Of The Item</label>
                     <input type="text" name="name" id="name" class="form-control" placeholder="Tittle for Item"
                         value="{{name}}">
-                    <label for="price">Price Rs. ( <b class="text-primary">Price / unit</b> ) </label>
-                    <input type="text" id="price" name="price" value="{{price}}" class="form-control"
-                        placeholder="Price for the item / unit of measurement (optional)">
-                    <h5 class="text-center text-success text-center">Current Categories</h5>
-                    {{#each dbcategory}}
-                    {{this.tittle}}
-                    {{/each}}
-
-                    <h5 class="text-success text-center">Current Images</h5>
-                    <div class="row">
-
-                        {{#each image}}
-                        <div class="col col-sm-6 col-md-4">
-                            {{slug}}
-                            <figure>
-                                <img src="/images/product_images/{{this}}" width="150" alt="{{this}}"><br>
-                                "hello"
-                            </figure>
-                        </div>
-                        {{/each}}
-                    </div>
-                    <label for="category"> Select Category (<b class="text-primary">Press control to select multple
-                        </b>)</label>
-                    <select class="form-select" name="category" multiple>
+                    <label for="price">Add new Pricing With Unit</label>
+                    <input type="text" name="price" class="form-control" aria-required="true" id="price"
+                        placeholder="Price for the item - unit of measurement (required)">
+                    <label for="category"> Select to Add A New Category </label>
+                    <select class="form-select" name="category">
+                        <option value="">Select One of The following Category</option>
                         {{#each categories}}
                         <option value="{{this.slug}}">{{this.tittle}}</option>
                         {{/each}}
@@ -55,6 +38,50 @@
                     <button type="submit" class="btn btn-sm btn-success mt-2 px-5">Submit</button>
 
                 </form>
+                {{!-- pricing --}}
+                <h5 class="text-center text-success text-end">Current Pricings
+                    <i class="text-warning ">(Click to Remove Pricing)</i>
+                </h5>
+                {{!-- current pricings --}}
+                {{#each price}}
+                <a href="/admin/menu/edit-item-linked/{{this}}/{{../slug}}?action=removepricing"
+                    onclick="return confirm('Are you sure you want to remove this pricing')"
+                    class="btn btn-sm btn-primary my-1">{{this}} <i class="fa fa-times text-danger"></i>
+                </a>
+
+                {{/each}}
+                <br>
+                {{!-- category --}}
+                <h5 class="text-center text-success text-center">Current Categories
+                    <i class="text-warning ">(Click to Remove Category)</i>
+                </h5>
+
+                {{#each assignedcategory}}
+
+                <a href="/admin/menu/edit-item-linked/{{this}}/{{../slug}}?action=removecategory"
+                    onclick="return confirm('Are you sure you want to unlink from this item')"
+                    class="btn btn-sm btn-primary mt-1">{{this}} <i class="fa fa-times text-danger"></i></a>
+
+                {{/each}}
+
+                <h5 class="text-success text-center">Current Images</h5>
+                <div class="row">
+
+                    {{#each image}}
+                    <div class="col col-sm-6 col-md-4">
+                        <figure>
+                            <img src="/images/product_images/{{../slug}}/{{this}}" width="150" alt="{{this}}"><br>
+                            <a href="/admin/menu/edit-item-linked/{{this}}/{{../slug}}?action=removeimage"
+                                onclick="return confirm('Are you sure you want to unlink from this item')"
+                                class=" mt-1 btn btn-sm btn-danger">
+                                Delete Image</a>
+                        </figure>
+                    </div>
+                    {{/each}}
+                </div>
+
+
+
             </main>
         </div>
     </div>

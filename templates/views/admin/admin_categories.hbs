@@ -24,7 +24,7 @@
                 <table class="table table-striped text-center ">
                     <thead>
                         <tr>
-                            <th>View</th>
+                            <th>Highlight</th>
                             <th>Image</th>
                             <th>Tittle</th>
                             <th>Actions</th>
@@ -58,14 +58,17 @@
                                         <i class="fa fa-pencil"></i>
                                     </button>
                                 </a>
-                                <a href=" /admin/menu/edit-category/{{this.slug}}?action=delete" class="text-danger">
+                                <a href=" /admin/menu/edit-category/{{this.slug}}?action=delete"
+                                    onclick="return confirm('Are you sure you want to delete this item')"
+                                    class="text-danger">
                                     <button class="btn btn-default text-danger">
                                         <i class="fa fa-trash"></i>
+
                                     </button>
                                 </a>
                             </td>
-
-                        </tr> {{/each}}
+                        </tr>
+                        {{/each}}
                     </tbody>
                 </table>
 
